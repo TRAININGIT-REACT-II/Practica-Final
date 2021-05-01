@@ -105,3 +105,6 @@ dist
 
 # Base de datos local
 data/*.json
+
+# Compilación del cliente
+client/dist

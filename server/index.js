@@ -36,6 +36,8 @@ fastify.decorateRequest("token", null);
 fastify.decorateRequest("user", null);
 fastify.decorateRequest("authenticated", false);
 
+// Agregamos un hook para cargar el usuario en cada petición
+// si el token está presente.
 fastify.addHook("preHandler", (request, _reply, done) => {
   const token = request.headers[API_TOKEN_HEADER];
   request.token = token;
@@ -52,6 +54,8 @@ fastify.addHook("preHandler", (request, _reply, done) => {
   done();
 });
 
+// Una función para compborar si el usuario existe.
+// En otro caso, devuelve un 401
 const checkAuthentication = (request, reply, done) => {
   if (request.token == null) {
     reply.code(401).send({
@@ -75,7 +79,7 @@ const checkAuthentication = (request, reply, done) => {
  * Devuelve un simple OK. Se puede utilizar para comprobar si el servidor
  * funciona.
  */
-fastify.get("/", async () => {
+fastify.get("/api", async () => {
   return { status: "ok" };
 });
 
@@ -86,7 +90,7 @@ fastify.get("/", async () => {
  * Registra un nuevo usuario en el sistema. Recibe los parámetros por
  * el cuerpo del mensaje
  */
-fastify.post("/register", (request, reply) => {
+fastify.post("/api/register", (request, reply) => {
   const { username, password } = request.body;
 
   const userExists = db.get("users").find({ username }).value();
@@ -129,7 +133,7 @@ fastify.post("/register", (request, reply) => {
  *
  * Inicia sesión devolviendo el token para las peticiones
  */
-fastify.post("/login", (request, reply) => {
+fastify.post("/api/login", (request, reply) => {
   const { username, password } = request.body;
 
   const user = db.get("users").find({ username }).value();
@@ -170,7 +174,7 @@ fastify.post("/login", (request, reply) => {
  */
 fastify.route({
   method: "GET",
-  path: "/notes",
+  path: "/api/notes",
   preHandler: checkAuthentication,
   handler: (request, reply) => {
     // Obtenemos el usuario
@@ -189,7 +193,7 @@ fastify.route({
  */
 fastify.route({
   method: "GET",
-  path: "/notes/:id",
+  path: "/api/notes/:id",
   preHandler: checkAuthentication,
   handler: (request, reply) => {
     // Obtenemos el usuario
@@ -221,7 +225,7 @@ fastify.route({
  */
 fastify.route({
   method: "POST",
-  path: "/notes",
+  path: "/api/notes",
   preHandler: checkAuthentication,
   handler: (request, reply) => {
     // Obtenemos el usuario
@@ -253,7 +257,7 @@ fastify.route({
  */
 fastify.route({
   method: ["PATCH", "PUT"],
-  path: "/notes/:id",
+  path: "/api/notes/:id",
   preHandler: checkAuthentication,
   handler: (request, reply) => {
     // Obtenemos el usuario
@@ -294,7 +298,7 @@ fastify.route({
  */
 fastify.route({
   method: "DELETE",
-  path: "/notes/:id",
+  path: "/api/notes/:id",
   preHandler: checkAuthentication,
   handler: (request, reply) => {
     // Obtenemos el usuario
