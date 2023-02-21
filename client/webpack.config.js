@@ -17,6 +17,9 @@ module.exports = {
     // Si no se fuerza este comportamiento, al utilizar react-router y definir rutas,
     // webpack utilizara URLs relativas como /mi-ruta/main.js causando errores.
     publicPath: "/",
+    // Modificamos la funcion para generar los hashes y evitar errores en versiones
+    // de Node superiores a la 17
+    hashFunction: "xxhash64"
   },
   module: {
     // Definimos los distintos modulos de transpilacion disponibles
